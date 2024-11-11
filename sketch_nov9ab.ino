@@ -2,6 +2,9 @@ unsigned long lastBeatTime = 0;
 unsigned long startTime = 0;
 int beatCount = 0;
 float bpm = 0; // Variable to store BPM value
+float bpmValues[10]; // Array to hold the last 10 BPM values
+int bpmIndex = 0; // Index for BPM values array
+bool bpmStable = false; // Flag to indicate if BPM values are stable
 
 bool isPeak = false;
 int sensorValue = 0;
@@ -12,12 +15,9 @@ int readIndex = 0; // Index of the current reading
 int total = 0; // Sum of the readings
 int average = 0; // Average sensor value
 
-float bpmSum = 0; // Sum of BPM values for averaging
-int bpmCount = 0; // Count of BPM values for averaging
-
 // Adaptive threshold variables
 int threshold = 200; // Initial threshold
-float thresholdFactor = 0.75; // Factor to adjust threshold
+float thresholdFactor = 0.79; // Factor to adjust threshold
 
 void setup() {
   Serial.begin(9600);
@@ -28,6 +28,10 @@ void setup() {
   // Initialize the readings array to zero
   for (int i = 0; i < numReadings; i++) {
     readings[i] = 0;
+  }
+  // Initialize the BPM values array to zero
+  for (int i = 0; i < 10; i++) {
+    bpmValues[i] = 0;
   }
   startTime = millis();
 }
@@ -56,9 +60,6 @@ void loop() {
     // Calculate the average
     average = total / numReadings;
 
-    Serial.print("Smoothed Sensor Value: ");
-    Serial.println(average);
-
     // Adjust the threshold adaptively
     threshold = average * thresholdFactor;
 
@@ -68,46 +69,45 @@ void loop() {
       unsigned long currentTime = millis();
       if (currentTime - lastBeatTime > 300) { // Debounce time in ms
         beatCount++;
+
+        // Calculate time between beats
+        unsigned long beatInterval = currentTime - lastBeatTime;
+
+        // Calculate BPM if the interval is within a reasonable range
+        if (beatInterval > 375 && beatInterval < 1500) { // Corresponds to BPM range of 40 to 160
+          bpm = 60000.0 / beatInterval; // Scale to 60 seconds
+          
+          // Store the BPM value in the array
+          bpmValues[bpmIndex] = bpm;
+          bpmIndex = (bpmIndex + 1) % 10;
+
+          // Check if all BPM values are within the range of ±10 BPM
+          bpmStable = true;
+          for (int i = 0; i < 10; i++) {
+            if (bpmValues[i] < bpm - 10 || bpmValues[i] > bpm + 10) {
+              bpmStable = false;
+              break;
+            }
+          }
+
+          // Print BPM only if values are stable
+          if (bpmStable) {
+            Serial.print("BPM: ");
+            Serial.println(bpm);
+          }
+        }
+
         lastBeatTime = currentTime;
 
         // Blink LED to indicate a beat
         digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED
         delay(50); // Keep the LED on for 50ms
         digitalWrite(LED_BUILTIN, LOW); // Turn off the LED
-
-        // Debug beat detection
-        Serial.print("Beat Detected - Beat Count: ");
-        Serial.println(beatCount);
-        Serial.print("Current Time: ");
-        Serial.println(currentTime);
-        Serial.print("Last Beat Time: ");
-        Serial.println(lastBeatTime);
       }
     } else if (average < threshold || average < previousSensorValue) {
       isPeak = false;
     }
     previousSensorValue = average;
-
-    // Calculate BPM every 5 seconds
-    if (millis() - startTime >= 5000) { // 5-second interval
-      float timeInSeconds = (millis() - startTime) / 1000.0;
-      if (timeInSeconds > 0) {
-        bpm = (beatCount / timeInSeconds) * 60.0;
-        // Add BPM to running average
-        bpmSum += bpm;
-        bpmCount++;
-      }
-      // Calculate running average BPM
-      float avgBpm = bpmSum / bpmCount;
-      Serial.print("BPM: ");
-      Serial.println(avgBpm);
-
-      // Reset variables for the next interval
-      beatCount = 0;
-      startTime = millis();
-      bpmSum = 0; // Reset BPM sum
-      bpmCount = 0; // Reset BPM count
-    }
   }
   delay(1); // Minimal delay to prevent data saturation
 }

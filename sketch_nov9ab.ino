@@ -1,5 +1,13 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
 #include <algorithm> // Include algorithm library for std::sort
 
+// Wi-Fi credentials
+const char* ssid = "TALKTALK51FE11";       // Replace with your Wi-Fi SSID
+const char* password = "9Y4T4Y6T"; // Replace with your Wi-Fi password
+const char* serverUrl = "http://http://127.0.0.1:8000/bpm"; // Replace with your FastAPI server's URL
+
+// Heart rate monitoring variables
 unsigned long lastBeatTime = 0;
 unsigned long startTime = 0;
 int beatCount = 0;
@@ -35,7 +43,18 @@ void setup() {
     for (int i = 0; i < 10; i++) {
         bpmValues[i] = 0;
     }
+
     startTime = millis();
+
+    // Connect to Wi-Fi
+    WiFi.begin(ssid, password); // Connect to Wi-Fi
+    
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Connecting to WiFi...");
+    }
+
+    Serial.println("Connected to WiFi");
 }
 
 float calculateMedian(float arr[], int size) {
@@ -107,6 +126,9 @@ void loop() {
                         // Print stable BPM
                         Serial.print("BPM: ");
                         Serial.println(bpm);
+
+                        // Send the BPM data to the FastAPI server
+                        sendBPMToServer(bpm);
                     }
                 }
 
@@ -123,4 +145,27 @@ void loop() {
         previousSensorValue = average;
     }
     delay(1); // Minimal delay to prevent data saturation
+}
+
+// Function to send BPM data to the FastAPI server
+void sendBPMToServer(float bpmValue) {
+    HTTPClient http;
+    http.begin(serverUrl); // Specify the server URL
+
+    // Set the content type to JSON
+    http.addHeader("Content-Type", "application/json");
+
+    // Create the JSON payload with the BPM data
+    String payload = "{\"bpm\": " + String(bpmValue) + "}";
+
+    // Send a POST request with the JSON data
+    int httpResponseCode = http.POST(payload);
+
+    if (httpResponseCode > 0) {
+        Serial.println("Data sent successfully!");
+    } else {
+        Serial.println("Failed to send data");
+    }
+
+    http.end(); // Close the connection
 }

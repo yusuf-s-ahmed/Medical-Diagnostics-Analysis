@@ -1,10 +1,14 @@
 import streamlit as st
 import openai
+from dotenv import find_dotenv, load_dotenv
+import os
 from pydantic import BaseModel
 import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
 import time
+
+
 
 # Set up the page configuration
 st.set_page_config(
@@ -88,15 +92,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Helper function to play alert sound (HTML integration)
-def play_alert_sound():
-    alert_sound_html = """
-    <audio autoplay>
-        <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
-        Your browser does not support the audio element.
-    </audio>
-    """
-    st.markdown(alert_sound_html, unsafe_allow_html=True)
+# Hardcoded OpenAI API key
+openai.api_key = ""
+
 
 # Simulate data similar to your example
 x = np.linspace(102080, 102140, 20)  # X-axis values (time or sample points)
@@ -116,18 +114,19 @@ def prev_page():
 
 # Page 1: Introduction and User Details
 if st.session_state.page == 1:
-    st.title("AI Heart Rate Monitor")
+    st.title("HeartGuard")
     st.write("---")
     st.write(
         "This is a platform that monitors older and vulnerable people's BPMs. "
-        "Our sensor can communicate with back-end logic to automate diagnostics and alert a siren, "
-        "emergency authorities, and pinpoint your exact location on the map if no response by the wearer of the device is given."
+        "Our sensor can communicate with back-end logic to automate diagnostics and alert emergency authorities if needed."
     )
 
     user_name = st.text_input("Enter name:")
     user_email = st.text_input("Enter email:")
+    user_age = st.number_input("Enter age: ", min_value=1, step=1)
     user_weight = st.number_input('Enter weight (kg):', step=0.25)
     user_height = st.number_input('Enter height (m):')
+    user_bpm = st.number_input("Enter BPM:", min_value=0.0, step=0.1)  # BPM input
 
     st.write("Ensure ECG 3-Point Sensor is connected to the right forearm, left forearm, and right ankle.")
 
@@ -138,7 +137,56 @@ if st.session_state.page == 1:
     # Button to create BPM Insights
     if st.button("Create BPM Insights"):
         st.session_state.bpm_insights_created = True  # Set flag to True when button is clicked
+        
+        st.write("Generating Diagnostic...")
+        time.sleep(2)
         st.write(f"The BPM analysis was successfully emailed to {user_email}.")
+        
+        # GPT-3.5 Turbo analysis
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Using GPT-3.5 turbo instead of GPT-4
+        messages=[
+            {"role": "system", "content": """
+            You are a health assistant specialised in interpreting heart rate data. 
+            Use British spelling and form 5 very detailed paragraphs in a structured way to mimic a medical diagnostic report. 
+            Do not state the formula for BMI, just mention the BMI value you calculate.
+            Use ** <text> ** for headers, and do not use tentative language. Be direct and assertive as you are trained for this. 
+            Your analysis should be clear, confident, and based on the user's provided data. Capitalise the name. And make sure the patient details are exact and not rounded.
+            """},
+            {"role": "user", "content": f"""
+            The user's name is {user_name}, age is {user_age}, heart rate (BPM) is {user_bpm}, height is {user_height}, weight is {user_weight}.
+            Calculate the BMI based on the provided data and include it in your response. 
+            Then provide an analysis of this BPM based on age, potential risks, and health recommendations.
+            Format the response as follows:
+
+            **Patient Details:**
+            Name: {user_name}
+            Age: {user_age} years
+            Heart Rate (BPM): {user_bpm}
+            Height: {user_height} meters
+            Weight: {user_weight} kilograms
+
+            **BMI Calculation:**
+            Based on the provided measurements, the BMI is calculated as [calculated BMI]. Mention the BMI value without explaining the formula.
+
+            **BPM Analysis:**
+            Provide a detailed analysis of the user's BPM, considering age, normal ranges for heart rate, and whether the BPM is within the expected range for the user.
+
+            **Potential Risks:**
+            Discuss any potential risks based on the user's BPM and health metrics. Consider lifestyle factors, health conditions, and the relevance of maintaining a healthy heart rate.
+
+            **Health Recommendations:**
+            Based on the current heart rate and age, provide actionable recommendations for maintaining or improving cardiovascular health.
+
+            **Conclusion:**
+            Summarise the findings, including the normalcy of the heart rate, any risks, and the importance of maintaining a healthy lifestyle for heart health.
+            """}
+            ]
+        )
+
+        analysis_text = response.choices[0].message['content'].strip()  # Get the response text
+        st.session_state.analysis_text = analysis_text  # Store analysis in session state
+
 
     # Show the "View Analysis" button only if the "Create BPM Insights" button was clicked
     if st.session_state.bpm_insights_created:
@@ -150,106 +198,50 @@ if st.session_state.page == 1:
             st.session_state.view_analysis_triggered = True  # Set this flag to ensure transition happens only once
             next_page()  # Transition to the next page immediately
 
-    
 
+   
 
-    
-
-
-
-
-# Page 2: AI Overview
+# Page 2: AI Overview with Analysis
 elif st.session_state.page == 2:
-    st.title("Heart Rate Analysis Report")
+    st.title("AI Heart Rate Analysis Report")
     st.write("---")
-    st.write("""BPM: **87.38**""")
-    
-    
+    st.subheader("Data Visualisation of Your Pulse:")
 
 
-    # Create a Plotly figure
+    # Visualization with Plotly
+    x = np.linspace(102080, 102140, 20)
+    y = np.array([195, 195, 195, 195, 195, 196, 196, 195, 194, 194, 193, 195, 195, 195, 195, 195, 195, 195, 195, 195])
     fig = go.Figure()
 
-    # Add a line plot with a thinner red line
+    # Add line plot
     fig.add_trace(go.Scatter(
         x=x, 
         y=y, 
         mode='lines+markers', 
-        name='Value 1', 
-        line=dict(color='red', width=0.5),  # Thinner line width
+        name='BPM Data', 
+        line=dict(color='red', width=0.5),
         marker=dict(size=2)
     ))
 
-    st.subheader("Average Pulse Data Visualisation")
-
-    # Customize the layout to match the app's theme
+    # Customize layout
     fig.update_layout(
-        
         xaxis_title="Time (Sample)",
         yaxis_title="Sensor Value",
-        xaxis=dict(range=[102080, 102140]),  # Set range similar to your screenshot
+        xaxis=dict(range=[102080, 102140]),
         yaxis=dict(range=[193, 197]),
         template="plotly_dark",
-        font=dict(family="Roboto", color="#ababab", size=12),  # Font styling to match the app
-        plot_bgcolor="#18191c",  # Background color to match the Streamlit app
-        paper_bgcolor="#18191c"  # Overall chart background
+        font=dict(family="Roboto", color="#ababab", size=12),
+        plot_bgcolor="#18191c",
+        paper_bgcolor="#18191c"
     )
 
-    # Display the Plotly chart in Streamlit
     st.plotly_chart(fig)
 
-    
+    st.write(st.session_state.analysis_text)  # Display the AI-generated analysis
 
     
-    st.write("Your measured heart rate is **87.38 BPM**.")  
 
-    st.write("### Percentile Comparison")
-    st.write("""
-        Your heart rate falls within the **16th percentile** for your age group. 
-        This means that approximately **78% of 18-year-olds** (within the 18-21 age range) 
-        have a lower resting heart rate than you.
-    """)
-
-    st.write("### Interpretation of Your Resting Heart Rate")
-    st.write("""
-        A resting heart rate between **60-100 beats per minute** is generally considered normal for most adults. 
-        For young adults like yourself (18-21 years old), resting heart rates can vary widely based on fitness level, lifestyle, 
-        and genetics. 
-    """)
-
-    st.write("### Health and Fitness Insights")
-    st.write("""
-        - **Slightly Higher than Average**: Your heart rate is on the higher end of the average range, which could be due to various factors, 
-        including stress, caffeine intake, hydration levels, or physical conditioning.
-      
-        - **Impact of Physical Activity**: Individuals who are physically active or athletes often have lower resting heart rates, 
-        sometimes as low as 40-60 BPM, due to the heart’s increased efficiency.
-
-        - **Considerations for Health Monitoring**: A slightly elevated resting heart rate isn’t necessarily a cause for concern, 
-        but monitoring it over time can be useful. If it frequently exceeds 100 BPM at rest, consulting a healthcare provider may be beneficial.
-    """)
-
-    st.write("### Tips for Maintaining a Healthy Heart Rate")
-    st.write("""
-        - **Regular Exercise**: Engaging in cardiovascular activities, such as running, swimming, or cycling, 
-        can improve your heart’s efficiency and lower your resting heart rate.
-    
-        - **Manage Stress**: Chronic stress can elevate your heart rate. Practices like meditation, deep breathing exercises, 
-        and adequate sleep can help maintain a healthy heart rate.
-    
-        - **Stay Hydrated**: Dehydration can lead to an increased heart rate as your heart works harder to pump blood. 
-        Ensuring you drink enough water daily can help stabilize it.
-    """)    
-
-    st.write("### Conclusion")
-    st.write("""
-        Overall, your heart rate is within the normal range but slightly higher than average for your age group. 
-        Maintaining a healthy lifestyle through regular exercise, stress management, and proper hydration can help 
-        keep your heart rate within an optimal range.
-    """)
-
-
-    if st.button("<"):
+    if st.button("< Back"):
         prev_page()
 
     if st.button("Simulate Critical Alert >"):
@@ -277,7 +269,7 @@ elif st.session_state.page == 3:
     # Simulate Alert button
     if st.button("Simulate Alert"):
         st.session_state.alert_simulated = True  # Set the flag to True
-        st.write("Waiting for a response from Yusuf....")
+        st.write(f"Waiting for a response from the patient....")
         st.session_state.response_given = False  # Reset response flag when simulating a new alert
 
         # Countdown loop (appears first)
@@ -288,12 +280,7 @@ elif st.session_state.page == 3:
             countdown_text.markdown(f"**Time remaining:** {i} seconds")
             time.sleep(1)  # Delay for 1 second before updating
 
-            # If no response, proceed to alert
-            if not st.session_state.response_given and i == 1:
-                st.session_state.page = 5  # Trigger alert view within same page
-                st.write("No response detected, alert triggered!")
-                play_alert_sound()  # Play alert sound
-                break
+            
 
     # If response is given, show response details and hide alert
     if st.session_state.response_given:

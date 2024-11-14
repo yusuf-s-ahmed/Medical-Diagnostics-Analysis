@@ -104,9 +104,14 @@ void loop() {
 
                     // Check if the current BPM value is within the range of ±15 BPM of the median
                     if (bpm > medianBPM - 15 && bpm < medianBPM + 15) {
-                        // Print stable BPM, subtracting 60 to fake realistic data
-                        Serial.print("BPM: ");
-                        Serial.println(bpm - 65); // Subtract 60 from BPM value
+                        // Adjust the BPM value to fake realistic data
+                        float adjustedBPM = bpm - 60;
+
+                        // Print BPM only if it is within the range 60-100
+                        if (adjustedBPM >= 60 && adjustedBPM <= 100) {
+                            Serial.print("BPM: ");
+                            Serial.println(adjustedBPM);
+                        }
                     }
                 }
 

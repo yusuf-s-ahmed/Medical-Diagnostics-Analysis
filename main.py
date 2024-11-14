@@ -1,5 +1,5 @@
 import streamlit as st
-from fastapi import FastAPI
+import openai
 from pydantic import BaseModel
 import streamlit as st
 import plotly.graph_objects as go
@@ -87,17 +87,6 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
-app = FastAPI()
-# Define the schema for BPM data
-class BPMData(BaseModel):
-    bpm: float
-# Create an endpoint that accepts POST requests with BPM data
-@app.post("/bpm")
-async def receive_bpm(data: BPMData):
-    # Here you can store or process the BPM data as needed
-    print(f"Received BPM: {data.bpm}")
-    return {"message": "BPM received successfully"}
 
 # Helper function to play alert sound (HTML integration)
 def play_alert_sound():

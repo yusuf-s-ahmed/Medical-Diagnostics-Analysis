@@ -19,6 +19,8 @@ int average = 0; // Average sensor value
 // Adaptive threshold variables
 int threshold = 200; // Initial threshold
 const float thresholdFactor = 0.70; // Factor to adjust threshold
+bool printedAverageBPM = false; // Flag to ensure average BPM is printed only once
+int numBpmValues = 0; // Count of BPM values added to the array
 
 void setup() {
     Serial.begin(9600);
@@ -47,6 +49,14 @@ float calculateMedian(float arr[], int size) {
     } else {
         return (temp[(size / 2) - 1] + temp[size / 2]) / 2.0;
     }
+}
+
+float calculateAverage(float arr[], int size) {
+    float sum = 0;
+    for (int i = 0; i < size; i++) {
+        sum += arr[i];
+    }
+    return sum / size;
 }
 
 void loop() {
@@ -98,6 +108,7 @@ void loop() {
                     // Store the BPM value in the array
                     bpmValues[bpmIndex] = bpm;
                     bpmIndex = (bpmIndex + 1) % 10;
+                    numBpmValues++;
 
                     // Calculate the median of BPM values
                     float medianBPM = calculateMedian(bpmValues, 10);
@@ -110,8 +121,18 @@ void loop() {
                         // Print BPM only if it is within the range 60-100
                         if (adjustedBPM >= 60 && adjustedBPM <= 100) {
                             Serial.print("BPM: ");
-                            Serial.println(adjustedBPM);
+                            Serial.print(adjustedBPM);
+                            Serial.print(" | Metadata: ");
+                            Serial.println("Timestamp: " + String(currentTime) + "ms, Sensor Value: " + String(sensorValue));
                         }
+                    }
+
+                    // Print the average BPM value after 10 values and stop further prints
+                    if (!printedAverageBPM && numBpmValues >= 10) {
+                        float averageBPM = calculateAverage(bpmValues, 10) - 60;
+                        Serial.print("Average BPM: ");
+                        Serial.println(averageBPM);
+                        printedAverageBPM = true; // Ensure average BPM is printed only once
                     }
                 }
 

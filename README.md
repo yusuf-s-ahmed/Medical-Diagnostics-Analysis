@@ -1,10 +1,18 @@
 # HeartGuard: AI-driven Emergency Alert Medical Intervention Platform
 
 HeartGuard is an autonomous, AI-driven emergency alert medical intervention platform designed to provide accurate and reliable patient diagnostics for vulnerable individuals exhibiting signs of heart disease. Developed during a 48-hour hackathon hosted by City Robotics Society (UoL), the project features both a physical prototype for heartbeat detection and a fully functional AI-powered diagnostics web application.
-<br>
 
+<br></br>
+![Landing Page](landing.png)
+<br></br>
+![Critical Alert Simulation](simulation.png)
+<br></br>
+![Arduino, ECG Sensor Module & 3-Point Electrodes](arduino.png)
+<br></br>
 ![Emergency Alert Location Ping](map.jpeg)
-<br>
+<br></br>
+![Data Visualisation](visualisation.jpeg)
+<br></br>
 
 ## Overview
 

@@ -9,7 +9,7 @@ HeartGuard is an autonomous, AI-driven emergency alert medical intervention plat
 <br></br>
 ![Critical Alert Simulation](simulation.png)
 <br></br>
-![Arduino, ECG Sensor Module & 3-Point Electrodes](arduino.jpg)
+![Emergency Alert Location Ping](arduino.jpg)
 <br></br>
 ![Emergency Alert Location Ping](map.jpeg)
 <br></br>

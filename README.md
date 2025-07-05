@@ -1,6 +1,6 @@
 # Analysing Patient BPM for Medical Diagnostics Using Python, NumPy and C++
 
-**HeartGuard** is a hardware-software system developed during a 48-hour health hackathon at City, University of London. It detects early signs of heart disease and autonomously alerts emergency responders during critical events, with a focus on supporting vulnerable and elderly patients.
+At a 48-hour university health hackathon hosted by the City Robotics Society, I co-developed HeartGuard, a hardware-software system for real-time heart diagnostics and emergency response. The goal was to detect early signs of heart disease and autonomously notify responders in critical events, especially for vulnerable or elderly patients.
 
 ## Table of Contents
 

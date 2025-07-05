@@ -1,4 +1,4 @@
-# HeartGuard: AI-driven Emergency Alert Medical Intervention Platform
+# Analysing Patient BPM for Medical Diagnostics Using Python, NumPy and C++
 
 ## Overview
 <b>HeartGuard</b> is an autonomous, AI-driven emergency alert medical intervention platform designed to provide accurate and reliable patient diagnostics for vulnerable individuals exhibiting signs of heart disease. Developed during a 48-hour hackathon hosted by City Robotics Society (UoL), the project features both a physical prototype for heartbeat detection and a fully functional AI-powered diagnostics web application.

@@ -10,8 +10,7 @@
 - [Technology Stack](#technology-stack)
 - [Implementation Details](#implementation-details)
 - [Challenges and Solutions](#challenges-and-solutions)
-- [Lessons Learned](#lessons-learned)
-- [Future Work](#future-work)
+- [Impact](#impact)
 
 ## Overview
 
@@ -33,7 +32,7 @@ At a 48-hour university health hackathon hosted by the City Robotics Society, I 
 | Hardware          | Arduino Uno R4 Wi-Fi, 3-Point ECG Sensor   |
 | Signal Processing | C++                                       |
 | Web Application   | Python, Flask, Plotly, NumPy               |
-| AI Integration    | OpenAI GPT-4 & GPT-3.5 Turbo               |
+| AI Integration    | OpenAI GPT-4                               |
 | Communication     | Twilio Voice API, Webhook URLs             |
 
 ## Implementation Details

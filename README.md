@@ -3,18 +3,6 @@
 ## Overview
 <b>HeartGuard</b> is an autonomous, AI-driven emergency alert medical intervention platform designed to provide accurate and reliable patient diagnostics for vulnerable individuals exhibiting signs of heart disease. Developed during a 48-hour hackathon hosted by City Robotics Society (UoL), the project features both a physical prototype for heartbeat detection and a fully functional AI-powered diagnostics web application.
 
-## Demonstration
-![Landing Page](landing.png)
-<br></br>
-![Critical Alert Simulation](simulation.png)
-<br></br>
-![Arduino Uno R4 Wi-Fi, ECG Module & 3-Point Electrodes](arduino.JPG)
-<br></br>
-![Emergency Alert Location Ping](map.jpeg)
-<br></br>
-![Data Visualisation](visualisation.png)
-<br></br>
-
 ## Description
 
 HeartGuard uses a **3-point ECG sensor module** integrated with an **Arduino Uno R4 Wi-Fi** to detect heart rate and monitor for critical heart events. When a critical heart rate is detected, the system sends an automated alert and emergency call via **Twilio API**, notifying healthcare providers or first responders.

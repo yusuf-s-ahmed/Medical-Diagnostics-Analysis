@@ -1,39 +1,43 @@
 # Analysing Patient BPM for Medical Diagnostics Using Python, NumPy and C++
 
+# HeartGuard: Real-Time Heart Diagnostics and Emergency Alert System
+
+**HeartGuard** is a hardware-software system developed during a 48-hour health hackathon at City, University of London. It detects early signs of heart disease and autonomously alerts emergency responders during critical events, with a focus on supporting vulnerable and elderly patients.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Technology Stack](#technology-stack)
+- [Implementation Details](#implementation-details)
+- [Challenges and Solutions](#challenges-and-solutions)
+- [Lessons Learned](#lessons-learned)
+- [Future Work](#future-work)
+
+---
+
 ## Overview
-<b>HeartGuard</b> is an autonomous, AI-driven emergency alert medical intervention platform designed to provide accurate and reliable patient diagnostics for vulnerable individuals exhibiting signs of heart disease. Developed during a 48-hour hackathon hosted by City Robotics Society (UoL), the project features both a physical prototype for heartbeat detection and a fully functional AI-powered diagnostics web application.
 
-## Description
+At a 48-hour university health hackathon hosted by the City Robotics Society, I co-developed **HeartGuard**, a hardware-software system for real-time heart diagnostics and emergency response. The system was designed to detect early signs of heart disease and automatically notify responders in critical situations.
 
-HeartGuard uses a **3-point ECG sensor module** integrated with an **Arduino Uno R4 Wi-Fi** to detect heart rate and monitor for critical heart events. When a critical heart rate is detected, the system sends an automated alert and emergency call via **Twilio API**, notifying healthcare providers or first responders.
-
-The platform also includes an AI-powered diagnostics system, leveraging **OpenAI GPT-4 & 3.5 Turbo** for generating structured medical reports and personalized healthcare recommendations. The system reduces manual effort by 80% and aims to improve response times for emergency medical intervention by around **2 minutes**.
+---
 
 ## Features
 
-- **Heartbeat Detection Prototype**: Using an Arduino Uno R4 Wi-Fi and a 3-point ECG sensor with gel-based electrodes to detect heart rate with 15% more accuracy than standard 1-point ECG devices (like Apple Watches).
-- **AI Diagnostics**: Integration with OpenAI’s GPT-4 & 3.5 Turbo to generate medical reports and healthcare recommendations automatically, reducing manual effort by 80%.
-- **Autonomous Emergency Alerts**: Automated system using **Twilio API** to send alerts and initiate emergency calls during critical heart rate events, pinging the patient's location for swift intervention.
-- **Full-stack Web Application**: Built using Python, NumPy, and Plotly to visualize heart rate data and provide diagnostics for 20+ simulated users.
-- **Twilio Integration**: Use of Twilio Voice API and Webhooks for reliable backend systems that achieve 95% reliability in alert simulations.
+- **3-point ECG hardware integration** with Arduino Uno R4 Wi-Fi, achieving 15% higher accuracy over typical single-point devices.
+- **C++ signal filtering algorithm** to remove voltage noise across over 300 test samples.
+- **Python diagnostics platform** using NumPy and Plotly to simulate and visualise BPM data for over 20 users.
+- **Automated alerting system** that uses Twilio Voice API and Webhooks to initiate phone calls and send GPS location during simulated heart emergencies.
+- **AI-generated medical summaries** using OpenAI GPT-4 and 3.5 Turbo, reducing manual documentation workload by approximately 80%.
 
-## Technologies Used
+---
 
-- **Hardware**: Arduino Uno R4 Wi-Fi, 3-point ECG sensor, Gel-based Electrodes
-- **Software**: Python, C++, OpenAI GPT-4 & 3.5 Turbo, Twilio API, Plotly, NumPy
-- **Web Development**: Full-stack Python application with a professional UI
+## System Architecture
 
-## Getting Started
-
-### Prerequisites
-
-- Arduino IDE for uploading code to Arduino Uno R4
-- Python 3.x
-- Twilio Account (for API keys)
-- Git
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yusuf-s-ahmed/heartguard.git
+```plaintext
+[ECG Sensor] → [Arduino Uno R4] → [C++ Noise Filter] → [Python Diagnostics App] → 
+→ [Threshold Detector] → [Twilio Webhook + Call] → [Emergency Contact]
+                                 ↳ [GPT-4 Report Generator] → [Medical Output]

@@ -4,8 +4,6 @@
 
 **HeartGuard** is a hardware-software system developed during a 48-hour health hackathon at City, University of London. It detects early signs of heart disease and autonomously alerts emergency responders during critical events, with a focus on supporting vulnerable and elderly patients.
 
----
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -17,13 +15,11 @@
 - [Lessons Learned](#lessons-learned)
 - [Future Work](#future-work)
 
----
 
 ## Overview
 
 At a 48-hour university health hackathon hosted by the City Robotics Society, I co-developed **HeartGuard**, a hardware-software system for real-time heart diagnostics and emergency response. The system was designed to detect early signs of heart disease and automatically notify responders in critical situations.
 
----
 
 ## Features
 
@@ -33,7 +29,6 @@ At a 48-hour university health hackathon hosted by the City Robotics Society, I 
 - **Automated alerting system** that uses Twilio Voice API and Webhooks to initiate phone calls and send GPS location during simulated heart emergencies.
 - **AI-generated medical summaries** using OpenAI GPT-4 and 3.5 Turbo, reducing manual documentation workload by approximately 80%.
 
----
 
 ## System Architecture
 
